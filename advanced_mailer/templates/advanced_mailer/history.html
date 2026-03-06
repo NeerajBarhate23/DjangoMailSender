@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sent Email History</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .table-row:hover { background: rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body class="flex items-center justify-center py-8 px-4">
+    <div class="max-w-4xl w-full glass-card p-8 md:p-10 rounded-3xl">
+
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-white tracking-tight">📋 Sent Email History</h2>
+                <p class="mt-1 text-sm text-indigo-300">Log of all emails sent through the advanced mailer.</p>
+            </div>
+            <a href="{% url 'advanced_send_email' %}" class="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-500 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Compose New
+            </a>
+        </div>
+
+        {% if sent_emails %}
+        <div class="overflow-x-auto rounded-2xl border border-white/10">
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="border-b border-white/10 bg-white/5">
+                        <th class="px-5 py-4 text-indigo-300 font-semibold">#</th>
+                        <th class="px-5 py-4 text-indigo-300 font-semibold">Date</th>
+                        <th class="px-5 py-4 text-indigo-300 font-semibold">To</th>
+                        <th class="px-5 py-4 text-indigo-300 font-semibold">Subject</th>
+                        <th class="px-5 py-4 text-indigo-300 font-semibold">Attachment</th>
+                        <th class="px-5 py-4 text-indigo-300 font-semibold">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for email in sent_emails %}
+                    <tr class="table-row border-b border-white/5 transition-colors duration-200">
+                        <td class="px-5 py-4 text-gray-400">{{ forloop.counter }}</td>
+                        <td class="px-5 py-4 text-gray-300 whitespace-nowrap">{{ email.date_sent|date:"d M Y, h:i A" }}</td>
+                        <td class="px-5 py-4 text-gray-200 font-medium">{{ email.to_email }}</td>
+                        <td class="px-5 py-4 text-gray-300 max-w-xs truncate">{{ email.subject }}</td>
+                        <td class="px-5 py-4 text-gray-400">
+                            {% if email.attachment_name %}
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-medium">
+                                    📎 {{ email.attachment_name }}
+                                </span>
+                            {% else %}
+                                <span class="text-gray-600">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-4">
+                            {% if email.status == 'SUCCESS' %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-semibold">
+                                    ✅ Success
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-semibold">
+                                    ❌ Failed
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="text-center py-16">
+                <p class="text-4xl mb-4">📭</p>
+                <p class="text-gray-400 text-lg">No emails sent yet.</p>
+                <p class="text-gray-500 text-sm mt-1">Compose your first email to see it here!</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
